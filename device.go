@@ -1,13 +1,15 @@
-// The package gomotion defines a concurrent Go library that can connect to a Leap motion device over a WebSocket conection.
+// Package gomotion defines a concurrent Go library that can connect to a Leap motion device over a WebSocket conection.
 // By default, the LeapMotion exposes a JSON WebSocket that pumps out messages near 30 to 50 fps.
 package gomotion
 
 import (
-	"code.google.com/p/go.net/websocket"
+	//"code.google.com/p/go.net/websocket"
 	"net"
+
+	"golang.org/x/net/websocket"
 )
 
-// A simple type to carry decode errors along rather than just dieing.
+// FrameErr A simple type to carry decode errors along rather than just dieing.
 type FrameErr struct {
 	Frame *Frame
 	Error error
@@ -19,7 +21,7 @@ type LeapMotionDevice struct {
 	Connection *websocket.Conn
 }
 
-// This function acts as a constructor and connector for the gomotion package.
+// GetDevice This function acts as a constructor and connector for the gomotion package.
 func GetDevice(url string) (*LeapMotionDevice, error) {
 	pipe := make(chan FrameErr)
 	connection, err := websocket.Dial(url, "", "http://localhost")
@@ -29,11 +31,11 @@ func GetDevice(url string) (*LeapMotionDevice, error) {
 	return &LeapMotionDevice{pipe, connection}, nil
 }
 
-// This function starts the listening on the WebSocket. By default it enables Gestures on the LeapMotionDevice.
+// Listen This function starts the listening on the WebSocket. By default it enables Gestures on the LeapMotionDevice.
 func (device *LeapMotionDevice) Listen() error {
 	config := struct {
-		enableGestures bool `json:"enableGestures"`
-	} { true }
+		EnableGestures bool `json:"enableGestures"`
+	}{true}
 	if err := websocket.JSON.Send(device.Connection, &config); err != nil {
 		return err
 	}
@@ -54,10 +56,10 @@ func (device *LeapMotionDevice) listenRead() {
 		}
 		device.Pipe <- frame
 	}
-	close(device.Pipe)
+	//close(device.Pipe)
 }
 
-// This function closes the internal WebSocket connection on a LeapMotionDevice
+// Close This function closes the internal WebSocket connection on a LeapMotionDevice
 func (device *LeapMotionDevice) Close() {
 	device.Connection.Close()
 }
