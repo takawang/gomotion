@@ -3,7 +3,7 @@
 package gomotion
 
 import (
-	"code.google.com/p/go.net/websocket"
+	"golang.org/x/net/websocket"
 	"net"
 )
 
@@ -33,7 +33,7 @@ func GetDevice(url string) (*LeapMotionDevice, error) {
 func (device *LeapMotionDevice) Listen() error {
 	config := struct {
 		enableGestures bool `json:"enableGestures"`
-	} { true }
+	}{true}
 	if err := websocket.JSON.Send(device.Connection, &config); err != nil {
 		return err
 	}
